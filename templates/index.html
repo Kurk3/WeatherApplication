@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Application</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<main>
+    <section class="heading-section">
+        <h1>Weather Application</h1>
+    </section>
+
+    <section class="add-city-section">
+        <div class="add-city-form">
+            <form class="add-city-form-inside" method="POST">
+                <label>Add City</label>
+                <input type="text"
+                       name="city"
+                       placeholder="Add your favorite city">
+                <button>Add City</button>
+            </form>
+        </div>
+    </section>
+
+
+    <section class="cities-section">
+
+        <div class="cities-header">
+            <h2>Cities</h2>
+        </div>
+
+        <div class="cities-wrapper">
+            {% for weather in weather_data %}
+                <div class="city-item">
+
+                    <a href=" {{ url_for('delete_city', name=(weather.city)) }}">
+                        <button class="delete">X</button>
+                    </a>
+
+                    <div class="city-item-header">
+                        <h3>{{ weather.city }}</h3>
+                        <figure>
+                            <img src="http://openweathermap.org/img/w/{{ weather.icon }}.png" alt="Image"
+                                 class="weather-icon">
+                        </figure>
+                    </div>
+                    <div class="city-item-footer">
+                        <p>Temperature: <span class="temperature">{{ weather.temperature }}° C</span></p>
+                        <p>Type: <span class="humidity">{{ weather.description }}</span></p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

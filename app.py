@@ -6,22 +6,20 @@ from flask_sqlalchemy import SQLAlchemy
 DB_NAME = 'weather.db'
 
 app = Flask(__name__)
+
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'thisisasecret'
-db = SQLAlchemy(app)
+app.config['SECRET_KEY'] = 'webuildthistown'
 
+
+db = SQLAlchemy(app)
 
 class City(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
 
 
-def get_weather_data(city):
-    weather_link = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid=b21a2633ddaac750a77524f91fe104e7"
-    req = requests.get(weather_link).json()
-    return req
 
 
 @app.route('/')
@@ -40,7 +38,7 @@ def index_get():
         }
 
         weather_data.append(weather)
-    return render_template('weather.html', weather_data=weather_data)
+    return render_template('index.html', weather_data=weather_data)
 
 
 @app.route('/', methods=['POST'])
@@ -56,20 +54,28 @@ def index_post():
         if not existing_city:
             new_city_data = get_weather_data(new_city)
             if new_city_data['cod'] == 200:
-                new_city_obj = City(name=new_city)
+                new_city_object = City(name=new_city)
 
-                db.session.add(new_city_obj)
-                db.session.commit() # ulozenie mesta do databazy.
+                db.session.add(new_city_object)
+                db.session.commit()
             else:
-                err_msg = 'That is not a valid city!'
+                print('this is not a valid city')
         else:
-            err_msg = 'City already exists in the database!'
+            print('City already exists in the database!')
 
     if err_msg:
-        flash(err_msg, 'error')
+        print('error', err_msg)
     else:
-        flash('City added successfully!', 'success')
+        print('City added successfully!')
     return redirect(url_for('index_get'))
+
+
+#################################FUNCTIONS#############################################
+
+def get_weather_data(city):
+    weather_link = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid=b21a2633ddaac750a77524f91fe104e7"
+    req = requests.get(weather_link).json()
+    return req
 
 
 @app.route('/delete/<name>')
@@ -77,6 +83,5 @@ def delete_city(name):
     city = City.query.filter_by(name=name).first()
     db.session.delete(city)
     db.session.commit()
-
-    flash(f'Successfully deleted {city.name}!', 'success')
+    print('City deleted successfully!' + city.name)
     return redirect(url_for('index_get'))
