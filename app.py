@@ -25,6 +25,7 @@ class City(db.Model):
 @app.route('/')
 def index_get():
     cities = City.query.all()
+
     weather_data = []
 
     for city in cities:  # select city from cities from db.
@@ -72,6 +73,7 @@ def index_post():
 
 #################################FUNCTIONS#############################################
 
+
 def get_weather_data(city):
     weather_link = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid=b21a2633ddaac750a77524f91fe104e7"
     req = requests.get(weather_link).json()
@@ -85,3 +87,4 @@ def delete_city(name):
     db.session.commit()
     print('City deleted successfully!' + city.name)
     return redirect(url_for('index_get'))
+
