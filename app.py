@@ -3,24 +3,24 @@ import string
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 
+from backend.scripts import get_weather_data
+
 DB_NAME = 'weather.db'
 
 app = Flask(__name__)
+
+####db_congiguration####
 
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'webuildthistown'
 
-
+# register functions blueprint
 db = SQLAlchemy(app)
 
-class City(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
 
-
-
+########MAIM#############
 
 @app.route('/')
 def index_get():
@@ -39,7 +39,7 @@ def index_get():
         }
 
         weather_data.append(weather)
-    return render_template('index.html', weather_data=weather_data)
+    return render_template('main.html', weather_data=weather_data)
 
 
 @app.route('/', methods=['POST'])
@@ -71,13 +71,7 @@ def index_post():
     return redirect(url_for('index_get'))
 
 
-#################################FUNCTIONS#############################################
-
-
-def get_weather_data(city):
-    weather_link = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid=b21a2633ddaac750a77524f91fe104e7"
-    req = requests.get(weather_link).json()
-    return req
+#####################################ROUTES#############################################################
 
 
 @app.route('/delete/<name>')
@@ -88,3 +82,9 @@ def delete_city(name):
     print('City deleted successfully!' + city.name)
     return redirect(url_for('index_get'))
 
+
+####################MODELS#############################
+
+class City(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
